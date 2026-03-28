@@ -1,5 +1,6 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
+import { TODO_LIST_SELECT } from "@/lib/todoQueries";
 import DashboardTodoClient from "@/components/dashboard/DashboardTodoClient";
 import type { Todo } from "@/types/todo";
 
@@ -15,7 +16,7 @@ export default async function DashboardPage() {
 
   const { data: rows, error } = await supabase
     .from("todos")
-    .select("*")
+    .select(TODO_LIST_SELECT)
     .eq("user_id", user.id)
     .order("created_at", { ascending: false });
 

@@ -6,6 +6,14 @@ import { createClient } from "@/lib/supabase/server";
 import { mapNetworkMessage } from "@/lib/mapErrors";
 import type { ActionResult } from "@/types/action";
 
+/** 루트 `layout` 전체 무효화 대신, 인증 상태와 연관된 세그먼트만 갱신 */
+function revalidateAfterAuthSessionChange(): void {
+  revalidatePath("/dashboard", "layout");
+  revalidatePath("/login");
+  revalidatePath("/signup");
+  revalidatePath("/");
+}
+
 function mapAuthError(message: string): string {
   const network = mapNetworkMessage(message);
   if (network) return network;
@@ -23,7 +31,7 @@ function mapAuthError(message: string): string {
     return "이미 등록된 이메일입니다.";
   }
   if (lower.includes("password")) {
-    return message;
+    return "비밀번호 요건을 확인한 뒤 다시 시도해주세요.";
   }
   if (lower.includes("rate limit") || lower.includes("too many")) {
     return "요청이 너무 많습니다. 잠시 후 다시 시도해주세요.";
@@ -63,7 +71,7 @@ export async function login(
     return { success: false, error: mapAuthError(error.message) };
   }
 
-  revalidatePath("/", "layout");
+  revalidateAfterAuthSessionChange();
   return { success: true };
 }
 
@@ -93,13 +101,13 @@ export async function signup(
     return { success: false, error: mapAuthError(error.message) };
   }
 
-  revalidatePath("/", "layout");
+  revalidateAfterAuthSessionChange();
   return { success: true };
 }
 
 export async function logout(): Promise<void> {
   const supabase = await createClient();
   await supabase.auth.signOut();
-  revalidatePath("/", "layout");
+  revalidateAfterAuthSessionChange();
   redirect("/login");
 }

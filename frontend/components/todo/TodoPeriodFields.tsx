@@ -1,7 +1,19 @@
 "use client";
 
+import dynamic from "next/dynamic";
 import { useCallback, useState } from "react";
-import DateTimePopoverPicker from "@/components/todo/DateTimePopoverPicker";
+
+const DateTimePopoverPicker = dynamic(
+  () => import("@/components/todo/DateTimePopoverPicker"),
+  {
+    ssr: false,
+    loading: () => (
+      <div className="flex min-h-11 w-full items-center rounded-2xl border border-dashed border-gray-200 bg-gray-50/80 px-4 py-2.5 text-sm text-gray-400">
+        날짜·시간 선택 불러오는 중…
+      </div>
+    ),
+  },
+);
 
 interface TodoPeriodFieldsProps {
   startsId: string;

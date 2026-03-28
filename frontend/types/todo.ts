@@ -1,3 +1,7 @@
+/**
+ * Supabase `todos` 테이블 행과 동일한 필드명(snake_case)을 씁니다.
+ * UI 전용 camelCase DTO가 필요하면 이 타입에서 매핑하는 레이어를 둡니다.
+ */
 export interface Todo {
   id: string;
   user_id: string;

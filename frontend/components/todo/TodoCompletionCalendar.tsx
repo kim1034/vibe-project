@@ -3,6 +3,11 @@
 import { useMemo, useState } from "react";
 import type { Todo } from "@/types/todo";
 import {
+  addCalendarMonths,
+  formatCalendarMonthYearKo,
+  WEEKDAY_LABELS_KO,
+} from "@/lib/calendarLocale";
+import {
   buildMonthDayCells,
   localDateKeyFromDate,
   makeDateKey,
@@ -15,8 +20,6 @@ interface TodoCompletionCalendarProps {
   onSelectDateKey: (key: string | null) => void;
   className?: string;
 }
-
-const WEEKDAYS = ["일", "월", "화", "수", "목", "금", "토"];
 
 export default function TodoCompletionCalendar({
   todos,
@@ -33,6 +36,7 @@ export default function TodoCompletionCalendar({
   const completionCountByDay = useMemo(() => {
     const map = new Map<string, number>();
     for (const t of todos) {
+      if (!t.is_completed) continue;
       const key = todoCompletionDayKey(t);
       if (!key) continue;
       const [y, m] = key.split("-").map(Number);
@@ -48,27 +52,18 @@ export default function TodoCompletionCalendar({
     [viewYear, viewMonthIndex],
   );
 
-  const monthLabel = new Intl.DateTimeFormat("ko-KR", {
-    year: "numeric",
-    month: "long",
-  }).format(new Date(viewYear, viewMonthIndex, 1));
+  const monthLabel = formatCalendarMonthYearKo(viewYear, viewMonthIndex);
 
   function goPrevMonth() {
-    if (viewMonthIndex === 0) {
-      setViewMonthIndex(11);
-      setViewYear((y) => y - 1);
-    } else {
-      setViewMonthIndex((m) => m - 1);
-    }
+    const next = addCalendarMonths(viewYear, viewMonthIndex, -1);
+    setViewYear(next.year);
+    setViewMonthIndex(next.monthIndex);
   }
 
   function goNextMonth() {
-    if (viewMonthIndex === 11) {
-      setViewMonthIndex(0);
-      setViewYear((y) => y + 1);
-    } else {
-      setViewMonthIndex((m) => m + 1);
-    }
+    const next = addCalendarMonths(viewYear, viewMonthIndex, 1);
+    setViewYear(next.year);
+    setViewMonthIndex(next.monthIndex);
   }
 
   function handleDayClick(day: number) {
@@ -115,7 +110,7 @@ export default function TodoCompletionCalendar({
         role="grid"
         aria-readonly="true"
       >
-        {WEEKDAYS.map((d) => (
+        {WEEKDAY_LABELS_KO.map((d) => (
           <div key={d} role="columnheader" className="py-1">
             {d}
           </div>

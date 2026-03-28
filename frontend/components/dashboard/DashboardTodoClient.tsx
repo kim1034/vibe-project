@@ -1,9 +1,9 @@
 "use client";
 
-import { useCallback, useMemo, useState } from "react";
+import dynamic from "next/dynamic";
+import { useCallback, useMemo, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import AddTodoForm from "@/components/todo/AddTodoForm";
-import TodoCompletionCalendar from "@/components/todo/TodoCompletionCalendar";
 import TodoFilter from "@/components/todo/TodoFilter";
 import TodoList from "@/components/todo/TodoList";
 import type { Todo } from "@/types/todo";
@@ -13,6 +13,21 @@ import {
   filterTodosForTab,
 } from "@/lib/todoFilters";
 
+const TodoCompletionCalendar = dynamic(
+  () => import("@/components/todo/TodoCompletionCalendar"),
+  {
+    ssr: false,
+    loading: () => (
+      <div
+        className="flex h-[min(14rem,40vh)] w-[min(calc(100vw-2rem),22rem)] items-center justify-center rounded-[1.75rem] border border-gray-100 bg-white text-sm text-gray-400 shadow-lg"
+        aria-hidden
+      >
+        달력 불러오는 중…
+      </div>
+    ),
+  },
+);
+
 interface DashboardTodoClientProps {
   initialTodos: Todo[];
 }
@@ -21,12 +36,15 @@ export default function DashboardTodoClient({
   initialTodos,
 }: DashboardTodoClientProps) {
   const router = useRouter();
+  const [, startRefreshTransition] = useTransition();
   const [filter, setFilter] = useState<TodoTabFilter>("all");
   const [selectedDateKey, setSelectedDateKey] = useState<string | null>(null);
 
   const refresh = useCallback(() => {
-    router.refresh();
-  }, [router]);
+    startRefreshTransition(() => {
+      router.refresh();
+    });
+  }, [router, startRefreshTransition]);
 
   const filtered = useMemo(() => {
     let list = filterTodosForTab(initialTodos, filter);

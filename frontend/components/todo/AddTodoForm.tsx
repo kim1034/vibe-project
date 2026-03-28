@@ -6,9 +6,12 @@ import Input from "@/components/ui/Input";
 import TodoPeriodFields from "@/components/todo/TodoPeriodFields";
 import { createTodo } from "@/app/actions/todo";
 import { datetimeLocalValueToIso } from "@/lib/todoPeriod";
-
-const TITLE_MAX = 200;
-const MEMO_MAX = 1000;
+import {
+  isTodoDraftValid,
+  MEMO_MAX,
+  TITLE_MAX,
+  validateTodoDraftFields,
+} from "@/lib/todoConstraints";
 
 interface AddTodoFormProps {
   /** 추가 성공 후 호출 — 부모에서 `getTodos()` 등으로 목록을 다시 불러오면 됩니다 */
@@ -36,35 +39,16 @@ export default function AddTodoForm({
   const [isPending, startTransition] = useTransition();
 
   function validateFields(): boolean {
-    const trimmed = title.trim();
-    let ok = true;
-    setTitleError("");
-    setMemoError("");
-    setPeriodError("");
-
-    if (!trimmed) {
-      setTitleError("제목을 입력해주세요.");
-      ok = false;
-    } else if (trimmed.length > TITLE_MAX) {
-      setTitleError(`제목은 ${TITLE_MAX}자 이내로 입력해주세요.`);
-      ok = false;
-    }
-
-    if (memo.length > MEMO_MAX) {
-      setMemoError(`메모는 ${MEMO_MAX}자 이내로 입력해주세요.`);
-      ok = false;
-    }
-
-    if (startsLocal && endsLocal) {
-      const a = new Date(startsLocal).getTime();
-      const b = new Date(endsLocal).getTime();
-      if (!Number.isNaN(a) && !Number.isNaN(b) && b < a) {
-        setPeriodError("종료 일시는 시작 일시보다 이후여야 합니다.");
-        ok = false;
-      }
-    }
-
-    return ok;
+    const errors = validateTodoDraftFields({
+      title,
+      memo,
+      startsLocal,
+      endsLocal,
+    });
+    setTitleError(errors.titleError);
+    setMemoError(errors.memoError);
+    setPeriodError(errors.periodError);
+    return isTodoDraftValid(errors);
   }
 
   async function handleSubmit(e: FormEvent) {

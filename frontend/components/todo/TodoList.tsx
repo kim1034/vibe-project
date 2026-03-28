@@ -1,4 +1,4 @@
-import { Todo } from "@/types/todo";
+import type { Todo } from "@/types/todo";
 import { TodoTabFilter } from "@/lib/todoFilters";
 import EmptyState from "./EmptyState";
 import TodoItem from "./TodoItem";

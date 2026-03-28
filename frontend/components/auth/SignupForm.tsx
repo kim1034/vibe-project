@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import Button from "@/components/ui/Button";
 import Input from "@/components/ui/Input";
+import AuthFormChrome from "@/components/auth/AuthFormChrome";
 import { signup } from "@/app/actions/auth";
 
 export default function SignupForm() {
@@ -45,18 +46,10 @@ export default function SignupForm() {
 
   return (
     <form onSubmit={handleSubmit} className="flex w-full flex-col gap-5">
-      <div className="mb-4 text-center">
-        <h1 className="text-3xl font-bold tracking-tight text-gray-900">
-          회원가입
-        </h1>
-        <span
-          className="mx-auto mt-3 block h-1.5 w-14 rounded-full bg-[var(--color-taskly-accent)] shadow-sm"
-          aria-hidden
-        />
-        <p className="mt-2 text-sm leading-relaxed text-gray-500">
-          새 계정을 만들어 할일 관리를 시작하세요
-        </p>
-      </div>
+      <AuthFormChrome
+        title="회원가입"
+        subtitle="새 계정을 만들어 할일 관리를 시작하세요"
+      />
 
       <Input
         label="이메일"

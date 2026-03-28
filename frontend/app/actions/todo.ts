@@ -1,12 +1,27 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import type { User } from "@supabase/supabase-js";
 import { createClient } from "@/lib/supabase/server";
 import { mapSupabaseMutationError } from "@/lib/mapErrors";
+import { MEMO_MAX, TITLE_MAX } from "@/lib/todoConstraints";
 import type { ActionResult } from "@/types/action";
 
-const TITLE_MAX = 200;
-const MEMO_MAX = 1000;
+type SupabaseServer = Awaited<ReturnType<typeof createClient>>;
+
+async function requireTodoUser(): Promise<
+  { supabase: SupabaseServer; user: User } | { error: string }
+> {
+  const supabase = await createClient();
+  const {
+    data: { user },
+    error: authError,
+  } = await supabase.auth.getUser();
+  if (authError || !user) {
+    return { error: "로그인이 필요합니다." };
+  }
+  return { supabase, user };
+}
 
 function validateTitle(title: string): string | null {
   const trimmed = title.trim();
@@ -14,7 +29,7 @@ function validateTitle(title: string): string | null {
     return "제목을 입력해주세요.";
   }
   if (trimmed.length > TITLE_MAX) {
-    return "제목은 200자 이내로 입력해주세요.";
+    return `제목은 ${TITLE_MAX}자 이내로 입력해주세요.`;
   }
   return null;
 }
@@ -24,7 +39,7 @@ function validateMemo(memo: string | null | undefined): string | null {
     return null;
   }
   if (memo.length > MEMO_MAX) {
-    return "메모는 1000자 이내로 입력해주세요.";
+    return `메모는 ${MEMO_MAX}자 이내로 입력해주세요.`;
   }
   return null;
 }
@@ -81,15 +96,11 @@ export async function createTodo(
   startsAtIso?: string | null,
   endsAtIso?: string | null,
 ): Promise<ActionResult> {
-  const supabase = await createClient();
-  const {
-    data: { user },
-    error: authError,
-  } = await supabase.auth.getUser();
-
-  if (authError || !user) {
-    return { success: false, error: "로그인이 필요합니다." };
+  const ctx = await requireTodoUser();
+  if ("error" in ctx) {
+    return { success: false, error: ctx.error };
   }
+  const { supabase, user } = ctx;
 
   const titleErr = validateTitle(title);
   if (titleErr) {
@@ -139,15 +150,11 @@ export async function updateTodo(
   startsAtIso?: string | null,
   endsAtIso?: string | null,
 ): Promise<ActionResult> {
-  const supabase = await createClient();
-  const {
-    data: { user },
-    error: authError,
-  } = await supabase.auth.getUser();
-
-  if (authError || !user) {
-    return { success: false, error: "로그인이 필요합니다." };
+  const ctx = await requireTodoUser();
+  if ("error" in ctx) {
+    return { success: false, error: ctx.error };
   }
+  const { supabase, user } = ctx;
 
   if (!id?.trim()) {
     return { success: false, error: "할 일을 찾을 수 없습니다." };
@@ -205,15 +212,11 @@ export async function toggleTodo(
   id: string,
   is_completed: boolean,
 ): Promise<ActionResult> {
-  const supabase = await createClient();
-  const {
-    data: { user },
-    error: authError,
-  } = await supabase.auth.getUser();
-
-  if (authError || !user) {
-    return { success: false, error: "로그인이 필요합니다." };
+  const ctx = await requireTodoUser();
+  if ("error" in ctx) {
+    return { success: false, error: ctx.error };
   }
+  const { supabase, user } = ctx;
 
   if (!id?.trim()) {
     return { success: false, error: "할 일을 찾을 수 없습니다." };
@@ -242,15 +245,11 @@ export async function toggleTodo(
 }
 
 export async function deleteTodo(id: string): Promise<ActionResult> {
-  const supabase = await createClient();
-  const {
-    data: { user },
-    error: authError,
-  } = await supabase.auth.getUser();
-
-  if (authError || !user) {
-    return { success: false, error: "로그인이 필요합니다." };
+  const ctx = await requireTodoUser();
+  if ("error" in ctx) {
+    return { success: false, error: ctx.error };
   }
+  const { supabase, user } = ctx;
 
   if (!id?.trim()) {
     return { success: false, error: "할 일을 찾을 수 없습니다." };

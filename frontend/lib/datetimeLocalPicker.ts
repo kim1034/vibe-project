@@ -1,5 +1,7 @@
 /** HTML `datetime-local` 값 `YYYY-MM-DDTHH:mm` (로컬 의미) 파싱·조합 */
 
+import { WEEKDAY_LABELS_KO } from "@/lib/calendarLocale";
+
 export interface LocalDateTimeParts {
   year: number;
   monthIndex: number;
@@ -58,17 +60,20 @@ export function partsToDatetimeLocalString(p: LocalDateTimeParts): string {
   return `${p.year}-${m}-${d}T${h}:${min}`;
 }
 
+/**
+ * `Intl` 대신 고정 한국어 요일·오전/오후를 써서 서버·클라이언트 문자열을 맞춘다.
+ */
 export function formatDatetimeLocalForDisplay(value: string): string {
   const p = parseDatetimeLocalString(value);
   if (!p) return "";
-  const d = new Date(p.year, p.monthIndex, p.day, p.hour, p.minute);
-  return new Intl.DateTimeFormat("ko-KR", {
-    year: "numeric",
-    month: "long",
-    day: "numeric",
-    weekday: "short",
-    hour: "numeric",
-    minute: "2-digit",
-    hour12: true,
-  }).format(d);
+  const wd = WEEKDAY_LABELS_KO[
+    new Date(p.year, p.monthIndex, p.day).getDay()
+  ];
+  const month = p.monthIndex + 1;
+  const isAm = p.hour < 12;
+  const period = isAm ? "오전" : "오후";
+  let h12 = p.hour % 12;
+  if (h12 === 0) h12 = 12;
+  const mm = String(p.minute).padStart(2, "0");
+  return `${p.year}년 ${month}월 ${p.day}일 (${wd}) ${period} ${h12}:${mm}`;
 }

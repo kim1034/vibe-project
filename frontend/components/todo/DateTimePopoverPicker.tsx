@@ -15,9 +15,12 @@ import {
   partsToDatetimeLocalString,
   type LocalDateTimeParts,
 } from "@/lib/datetimeLocalPicker";
+import {
+  addCalendarMonths,
+  formatCalendarMonthYearKo,
+  WEEKDAY_LABELS_KO,
+} from "@/lib/calendarLocale";
 import { buildMonthDayCells } from "@/lib/todoCompletionDay";
-
-const WEEKDAYS = ["일", "월", "화", "수", "목", "금", "토"];
 
 const HOURS = Array.from({ length: 24 }, (_, i) => i);
 const MINUTES = Array.from({ length: 60 }, (_, i) => i);
@@ -104,22 +107,16 @@ export default function DateTimePopoverPicker({
   );
 
   const goPrevMonth = useCallback(() => {
-    if (viewMonthIndex === 0) {
-      setViewMonthIndex(11);
-      setViewYear((y) => y - 1);
-    } else {
-      setViewMonthIndex((m) => m - 1);
-    }
-  }, [viewMonthIndex]);
+    const next = addCalendarMonths(viewYear, viewMonthIndex, -1);
+    setViewYear(next.year);
+    setViewMonthIndex(next.monthIndex);
+  }, [viewYear, viewMonthIndex]);
 
   const goNextMonth = useCallback(() => {
-    if (viewMonthIndex === 11) {
-      setViewMonthIndex(0);
-      setViewYear((y) => y + 1);
-    } else {
-      setViewMonthIndex((m) => m + 1);
-    }
-  }, [viewMonthIndex]);
+    const next = addCalendarMonths(viewYear, viewMonthIndex, 1);
+    setViewYear(next.year);
+    setViewMonthIndex(next.monthIndex);
+  }, [viewYear, viewMonthIndex]);
 
   useEffect(() => {
     if (!open) return;
@@ -144,10 +141,7 @@ export default function DateTimePopoverPicker({
     return () => window.clearTimeout(t);
   }, [open, viewYear, viewMonthIndex]);
 
-  const monthLabel = new Intl.DateTimeFormat("ko-KR", {
-    year: "numeric",
-    month: "long",
-  }).format(new Date(viewYear, viewMonthIndex, 1));
+  const monthLabel = formatCalendarMonthYearKo(viewYear, viewMonthIndex);
 
   const cells = buildMonthDayCells(viewYear, viewMonthIndex);
   const now = new Date();
@@ -211,7 +205,7 @@ export default function DateTimePopoverPicker({
             role="grid"
             aria-readonly="true"
           >
-            {WEEKDAYS.map((d) => (
+            {WEEKDAY_LABELS_KO.map((d) => (
               <div key={d} className="py-1" role="columnheader">
                 {d}
               </div>

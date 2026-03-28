@@ -1,4 +1,4 @@
-import { Todo } from "@/types/todo";
+import type { Todo } from "@/types/todo";
 import { effectivePeriodMs } from "@/lib/todoPeriod";
 
 export type TodoTabFilter = "all" | "active" | "completed";

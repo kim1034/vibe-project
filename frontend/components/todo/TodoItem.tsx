@@ -1,54 +1,24 @@
 "use client";
 
 import { FormEvent, useId, useState, useTransition } from "react";
-import { Todo } from "@/types/todo";
-import Button from "@/components/ui/Button";
+import type { Todo } from "@/types/todo";
 import Dialog from "@/components/ui/Dialog";
-import Input from "@/components/ui/Input";
-import TodoPeriodFields from "@/components/todo/TodoPeriodFields";
+import TodoItemEditForm from "@/components/todo/TodoItemEditForm";
+import TodoItemView from "@/components/todo/TodoItemView";
 import {
   datetimeLocalValueToIso,
   formatTodoPeriodLine,
   isoToDatetimeLocalValue,
-  periodBadgeForTodo,
-  type PeriodBadgeKind,
 } from "@/lib/todoPeriod";
+import {
+  isTodoDraftValid,
+  validateTodoDraftFields,
+} from "@/lib/todoConstraints";
 import {
   deleteTodo,
   toggleTodo,
   updateTodo,
 } from "@/app/actions/todo";
-
-const TITLE_MAX = 200;
-const MEMO_MAX = 1000;
-
-const BADGE_BY_KIND: Record<
-  PeriodBadgeKind,
-  string
-> = {
-  overdue: "bg-red-100 text-red-800 ring-1 ring-red-200/80",
-  today: "bg-amber-200/90 text-amber-950 ring-1 ring-amber-300/60",
-  soon: "bg-sky-100 text-sky-900 ring-1 ring-sky-200/80",
-  later: "bg-gray-100 text-gray-700 ring-1 ring-gray-200/80",
-  started_only: "bg-violet-100 text-violet-900 ring-1 ring-violet-200/80",
-};
-
-function PeriodBadge({ todo }: { todo: Todo }) {
-  const badge = periodBadgeForTodo(todo);
-  if (!badge) return null;
-  const done = todo.is_completed;
-  return (
-    <span
-      className={`inline-flex shrink-0 items-center rounded-full px-2 py-0.5 text-xs font-semibold ${
-        done
-          ? "bg-white/25 text-white ring-1 ring-white/40"
-          : BADGE_BY_KIND[badge.kind]
-      }`}
-    >
-      {badge.label}
-    </span>
-  );
-}
 
 interface TodoItemProps {
   todo: Todo;
@@ -86,35 +56,16 @@ export default function TodoItem({
   const periodLine = formatTodoPeriodLine(todo);
 
   function validateEdit(): boolean {
-    const trimmed = editTitle.trim();
-    let ok = true;
-    setTitleError("");
-    setMemoError("");
-    setPeriodError("");
-
-    if (!trimmed) {
-      setTitleError("제목을 입력해주세요.");
-      ok = false;
-    } else if (trimmed.length > TITLE_MAX) {
-      setTitleError(`제목은 ${TITLE_MAX}자 이내로 입력해주세요.`);
-      ok = false;
-    }
-
-    if (editMemo.length > MEMO_MAX) {
-      setMemoError(`메모는 ${MEMO_MAX}자 이내로 입력해주세요.`);
-      ok = false;
-    }
-
-    if (editStartsLocal && editEndsLocal) {
-      const a = new Date(editStartsLocal).getTime();
-      const b = new Date(editEndsLocal).getTime();
-      if (!Number.isNaN(a) && !Number.isNaN(b) && b < a) {
-        setPeriodError("종료 일시는 시작 일시보다 이후여야 합니다.");
-        ok = false;
-      }
-    }
-
-    return ok;
+    const errors = validateTodoDraftFields({
+      title: editTitle,
+      memo: editMemo,
+      startsLocal: editStartsLocal,
+      endsLocal: editEndsLocal,
+    });
+    setTitleError(errors.titleError);
+    setMemoError(errors.memoError);
+    setPeriodError(errors.periodError);
+    return isTodoDraftValid(errors);
   }
 
   function startEdit() {
@@ -217,158 +168,38 @@ export default function TodoItem({
 
         <div className="min-w-0 flex-1">
           {isEditing ? (
-            <form onSubmit={handleSave} className="flex flex-col gap-4" noValidate>
-              <Input
-                label="제목"
-                required
-                value={editTitle}
-                onChange={(e) => setEditTitle(e.target.value)}
-                maxLength={TITLE_MAX}
-                error={titleError || undefined}
-                autoComplete="off"
-              />
-              <p className="text-right text-xs text-gray-400">
-                {editTitle.length}/{TITLE_MAX}
-              </p>
-
-              <div className="flex flex-col gap-1.5">
-                <label
-                  htmlFor={memoId}
-                  className="text-sm font-medium text-gray-800"
-                >
-                  메모 <span className="font-normal text-gray-400">(선택)</span>
-                </label>
-                <textarea
-                  id={memoId}
-                  value={editMemo}
-                  onChange={(e) => setEditMemo(e.target.value)}
-                  maxLength={MEMO_MAX}
-                  rows={3}
-                  className={`rounded-2xl border px-4 py-2.5 text-sm text-gray-900 transition-colors
-                    focus:border-amber-400 focus:outline-none focus:ring-2 focus:ring-amber-400/25
-                    ${memoError ? "border-red-400" : "border-gray-200"}`}
-                  aria-invalid={memoError ? true : undefined}
-                />
-                <div className="flex justify-end">
-                  <p className="text-xs text-gray-400">{editMemo.length}/{MEMO_MAX}</p>
-                </div>
-                {memoError ? (
-                  <p className="text-xs text-red-500" role="alert">
-                    {memoError}
-                  </p>
-                ) : null}
-              </div>
-
-              <TodoPeriodFields
-                startsId={startsId}
-                endsId={endsId}
-                startsValue={editStartsLocal}
-                endsValue={editEndsLocal}
-                onStartsChange={setEditStartsLocal}
-                onEndsChange={setEditEndsLocal}
-                error={periodError || undefined}
-                disabled={savePending}
-              />
-
-              {actionError ? (
-                <p className="text-sm text-red-500" role="alert">
-                  {actionError}
-                </p>
-              ) : null}
-
-              <div className="flex flex-wrap justify-end gap-2">
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="sm"
-                  onClick={cancelEdit}
-                  disabled={savePending}
-                >
-                  취소
-                </Button>
-                <Button type="submit" size="sm" loading={savePending}>
-                  저장
-                </Button>
-              </div>
-            </form>
+            <TodoItemEditForm
+              memoId={memoId}
+              startsId={startsId}
+              endsId={endsId}
+              editTitle={editTitle}
+              editMemo={editMemo}
+              editStartsLocal={editStartsLocal}
+              editEndsLocal={editEndsLocal}
+              onEditTitle={setEditTitle}
+              onEditMemo={setEditMemo}
+              onEditStarts={setEditStartsLocal}
+              onEditEnds={setEditEndsLocal}
+              titleError={titleError}
+              memoError={memoError}
+              periodError={periodError}
+              actionError={actionError}
+              savePending={savePending}
+              onSubmit={handleSave}
+              onCancel={cancelEdit}
+            />
           ) : (
-            <>
-              <div className="flex flex-wrap items-start justify-between gap-2">
-                <div className="min-w-0 flex-1">
-                  <div className="flex flex-wrap items-center gap-2">
-                    <h3
-                      className={`text-base font-semibold ${
-                        completed
-                          ? "text-white/95 line-through decoration-white/60"
-                          : "text-gray-900"
-                      }`}
-                    >
-                      {todo.title}
-                    </h3>
-                    <PeriodBadge todo={todo} />
-                  </div>
-                  {periodLine ? (
-                    <p
-                      className={`mt-1 text-sm ${
-                        completed ? "text-white/80" : "text-gray-600"
-                      }`}
-                    >
-                      {periodLine}
-                    </p>
-                  ) : null}
-                  {todo.memo ? (
-                    <p
-                      className={`mt-1 whitespace-pre-wrap text-sm ${
-                        completed ? "text-white/85" : "text-gray-600"
-                      }`}
-                    >
-                      {todo.memo}
-                    </p>
-                  ) : null}
-                </div>
-                <div className="flex shrink-0 gap-2">
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="sm"
-                    onClick={startEdit}
-                    aria-label="할일 수정"
-                    className={
-                      completed
-                        ? "text-white hover:bg-white/15 focus-visible:ring-white/40"
-                        : ""
-                    }
-                  >
-                    수정
-                  </Button>
-                  <Button
-                    type="button"
-                    variant="danger"
-                    size="sm"
-                    onClick={() => {
-                      setActionError("");
-                      setDeleteOpen(true);
-                    }}
-                    aria-label="할일 삭제"
-                    className={
-                      completed
-                        ? "bg-white/20 text-white ring-1 ring-white/30 hover:bg-white/30 focus-visible:ring-white/50"
-                        : ""
-                    }
-                  >
-                    삭제
-                  </Button>
-                </div>
-              </div>
-              {actionError ? (
-                <p
-                  className={`mt-2 text-sm ${completed ? "font-medium text-red-900" : "text-red-500"}`}
-                  role="alert"
-                >
-                  {actionError}
-                </p>
-              ) : null}
-            </>
+            <TodoItemView
+              todo={todo}
+              completed={completed}
+              periodLine={periodLine}
+              onEdit={startEdit}
+              onDeleteClick={() => {
+                setActionError("");
+                setDeleteOpen(true);
+              }}
+              actionError={actionError}
+            />
           )}
         </div>
       </div>
