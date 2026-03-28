@@ -5,6 +5,14 @@ import { Todo } from "@/types/todo";
 import Button from "@/components/ui/Button";
 import Dialog from "@/components/ui/Dialog";
 import Input from "@/components/ui/Input";
+import TodoPeriodFields from "@/components/todo/TodoPeriodFields";
+import {
+  datetimeLocalValueToIso,
+  formatTodoPeriodLine,
+  isoToDatetimeLocalValue,
+  periodBadgeForTodo,
+  type PeriodBadgeKind,
+} from "@/lib/todoPeriod";
 import {
   deleteTodo,
   toggleTodo,
@@ -13,6 +21,34 @@ import {
 
 const TITLE_MAX = 200;
 const MEMO_MAX = 1000;
+
+const BADGE_BY_KIND: Record<
+  PeriodBadgeKind,
+  string
+> = {
+  overdue: "bg-red-100 text-red-800 ring-1 ring-red-200/80",
+  today: "bg-amber-200/90 text-amber-950 ring-1 ring-amber-300/60",
+  soon: "bg-sky-100 text-sky-900 ring-1 ring-sky-200/80",
+  later: "bg-gray-100 text-gray-700 ring-1 ring-gray-200/80",
+  started_only: "bg-violet-100 text-violet-900 ring-1 ring-violet-200/80",
+};
+
+function PeriodBadge({ todo }: { todo: Todo }) {
+  const badge = periodBadgeForTodo(todo);
+  if (!badge) return null;
+  const done = todo.is_completed;
+  return (
+    <span
+      className={`inline-flex shrink-0 items-center rounded-full px-2 py-0.5 text-xs font-semibold ${
+        done
+          ? "bg-white/25 text-white ring-1 ring-white/40"
+          : BADGE_BY_KIND[badge.kind]
+      }`}
+    >
+      {badge.label}
+    </span>
+  );
+}
 
 interface TodoItemProps {
   todo: Todo;
@@ -28,12 +64,17 @@ export default function TodoItem({
 }: TodoItemProps) {
   const formId = useId();
   const memoId = `${formId}-memo`;
+  const startsId = `${formId}-starts`;
+  const endsId = `${formId}-ends`;
 
   const [isEditing, setIsEditing] = useState(false);
   const [editTitle, setEditTitle] = useState(todo.title);
   const [editMemo, setEditMemo] = useState(todo.memo ?? "");
+  const [editStartsLocal, setEditStartsLocal] = useState("");
+  const [editEndsLocal, setEditEndsLocal] = useState("");
   const [titleError, setTitleError] = useState("");
   const [memoError, setMemoError] = useState("");
+  const [periodError, setPeriodError] = useState("");
   const [actionError, setActionError] = useState("");
 
   const [deleteOpen, setDeleteOpen] = useState(false);
@@ -42,12 +83,14 @@ export default function TodoItem({
   const [togglePending, startToggleTransition] = useTransition();
 
   const completed = todo.is_completed;
+  const periodLine = formatTodoPeriodLine(todo);
 
   function validateEdit(): boolean {
     const trimmed = editTitle.trim();
     let ok = true;
     setTitleError("");
     setMemoError("");
+    setPeriodError("");
 
     if (!trimmed) {
       setTitleError("제목을 입력해주세요.");
@@ -62,14 +105,26 @@ export default function TodoItem({
       ok = false;
     }
 
+    if (editStartsLocal && editEndsLocal) {
+      const a = new Date(editStartsLocal).getTime();
+      const b = new Date(editEndsLocal).getTime();
+      if (!Number.isNaN(a) && !Number.isNaN(b) && b < a) {
+        setPeriodError("종료 일시는 시작 일시보다 이후여야 합니다.");
+        ok = false;
+      }
+    }
+
     return ok;
   }
 
   function startEdit() {
     setEditTitle(todo.title);
     setEditMemo(todo.memo ?? "");
+    setEditStartsLocal(isoToDatetimeLocalValue(todo.starts_at));
+    setEditEndsLocal(isoToDatetimeLocalValue(todo.ends_at));
     setTitleError("");
     setMemoError("");
+    setPeriodError("");
     setActionError("");
     setIsEditing(true);
   }
@@ -78,6 +133,7 @@ export default function TodoItem({
     setIsEditing(false);
     setTitleError("");
     setMemoError("");
+    setPeriodError("");
     setActionError("");
   }
 
@@ -91,6 +147,8 @@ export default function TodoItem({
         todo.id,
         editTitle,
         editMemo.trim() ? editMemo : undefined,
+        datetimeLocalValueToIso(editStartsLocal),
+        datetimeLocalValueToIso(editEndsLocal),
       );
       if (!result.success) {
         setActionError(result.error);
@@ -201,6 +259,17 @@ export default function TodoItem({
                 ) : null}
               </div>
 
+              <TodoPeriodFields
+                startsId={startsId}
+                endsId={endsId}
+                startsValue={editStartsLocal}
+                endsValue={editEndsLocal}
+                onStartsChange={setEditStartsLocal}
+                onEndsChange={setEditEndsLocal}
+                error={periodError || undefined}
+                disabled={savePending}
+              />
+
               {actionError ? (
                 <p className="text-sm text-red-500" role="alert">
                   {actionError}
@@ -226,15 +295,27 @@ export default function TodoItem({
             <>
               <div className="flex flex-wrap items-start justify-between gap-2">
                 <div className="min-w-0 flex-1">
-                  <h3
-                    className={`text-base font-semibold ${
-                      completed
-                        ? "text-white/95 line-through decoration-white/60"
-                        : "text-gray-900"
-                    }`}
-                  >
-                    {todo.title}
-                  </h3>
+                  <div className="flex flex-wrap items-center gap-2">
+                    <h3
+                      className={`text-base font-semibold ${
+                        completed
+                          ? "text-white/95 line-through decoration-white/60"
+                          : "text-gray-900"
+                      }`}
+                    >
+                      {todo.title}
+                    </h3>
+                    <PeriodBadge todo={todo} />
+                  </div>
+                  {periodLine ? (
+                    <p
+                      className={`mt-1 text-sm ${
+                        completed ? "text-white/80" : "text-gray-600"
+                      }`}
+                    >
+                      {periodLine}
+                    </p>
+                  ) : null}
                   {todo.memo ? (
                     <p
                       className={`mt-1 whitespace-pre-wrap text-sm ${

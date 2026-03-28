@@ -28,6 +28,8 @@ export default async function DashboardPage() {
     return {
       ...r,
       completed_at: r.completed_at ?? null,
+      starts_at: r.starts_at ?? null,
+      ends_at: r.ends_at ?? null,
     };
   });
 

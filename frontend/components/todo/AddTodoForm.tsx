@@ -3,7 +3,9 @@
 import { FormEvent, useId, useState, useTransition } from "react";
 import Button from "@/components/ui/Button";
 import Input from "@/components/ui/Input";
+import TodoPeriodFields from "@/components/todo/TodoPeriodFields";
 import { createTodo } from "@/app/actions/todo";
+import { datetimeLocalValueToIso } from "@/lib/todoPeriod";
 
 const TITLE_MAX = 200;
 const MEMO_MAX = 1000;
@@ -20,11 +22,16 @@ export default function AddTodoForm({
 }: AddTodoFormProps) {
   const formId = useId();
   const memoId = `${formId}-memo`;
+  const startsId = `${formId}-starts`;
+  const endsId = `${formId}-ends`;
 
   const [title, setTitle] = useState("");
   const [memo, setMemo] = useState("");
+  const [startsLocal, setStartsLocal] = useState("");
+  const [endsLocal, setEndsLocal] = useState("");
   const [titleError, setTitleError] = useState("");
   const [memoError, setMemoError] = useState("");
+  const [periodError, setPeriodError] = useState("");
   const [submitError, setSubmitError] = useState("");
   const [isPending, startTransition] = useTransition();
 
@@ -33,6 +40,7 @@ export default function AddTodoForm({
     let ok = true;
     setTitleError("");
     setMemoError("");
+    setPeriodError("");
 
     if (!trimmed) {
       setTitleError("제목을 입력해주세요.");
@@ -47,6 +55,15 @@ export default function AddTodoForm({
       ok = false;
     }
 
+    if (startsLocal && endsLocal) {
+      const a = new Date(startsLocal).getTime();
+      const b = new Date(endsLocal).getTime();
+      if (!Number.isNaN(a) && !Number.isNaN(b) && b < a) {
+        setPeriodError("종료 일시는 시작 일시보다 이후여야 합니다.");
+        ok = false;
+      }
+    }
+
     return ok;
   }
 
@@ -59,13 +76,22 @@ export default function AddTodoForm({
     }
 
     startTransition(async () => {
-      const result = await createTodo(title, memo || undefined);
+      const startsIso = datetimeLocalValueToIso(startsLocal);
+      const endsIso = datetimeLocalValueToIso(endsLocal);
+      const result = await createTodo(
+        title,
+        memo || undefined,
+        startsIso,
+        endsIso,
+      );
       if (!result.success) {
         setSubmitError(result.error);
         return;
       }
       setTitle("");
       setMemo("");
+      setStartsLocal("");
+      setEndsLocal("");
       onSuccess?.();
     });
   }
@@ -140,6 +166,18 @@ export default function AddTodoForm({
             </p>
           </div>
         </div>
+
+        <TodoPeriodFields
+          startsId={startsId}
+          endsId={endsId}
+          startsValue={startsLocal}
+          endsValue={endsLocal}
+          onStartsChange={setStartsLocal}
+          onEndsChange={setEndsLocal}
+          error={periodError || undefined}
+          disabled={isPending}
+          hint="비워 두면 기간 없음. 입력한 시각은 이 기기의 로컬 시간이며, 저장 시 UTC로 맞춰집니다."
+        />
 
         {submitError && (
           <p className="text-sm text-red-500" role="alert">
