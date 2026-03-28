@@ -76,6 +76,8 @@ export default function DateTimePopoverPicker({
   const [draft, setDraft] = useState<LocalDateTimeParts>(() =>
     defaultDraft(value),
   );
+  const draftRef = useRef(draft);
+  draftRef.current = draft;
 
   useEffect(() => {
     setMounted(true);
@@ -84,18 +86,19 @@ export default function DateTimePopoverPicker({
   useEffect(() => {
     if (!open) return;
     const d = defaultDraft(value);
+    draftRef.current = d;
     setDraft(d);
     setViewYear(d.year);
     setViewMonthIndex(d.monthIndex);
   }, [open, value]);
 
+  /** 부모 setState는 setDraft 업데이터 안에서 호출하면 안 됨 (React 경고) */
   const commit = useCallback(
-    (patch: Partial<LocalDateTimeParts> | LocalDateTimeParts) => {
-      setDraft((prev) => {
-        const next = { ...prev, ...patch };
-        onChange(partsToDatetimeLocalString(next));
-        return next;
-      });
+    (patch: Partial<LocalDateTimeParts>) => {
+      const next = { ...draftRef.current, ...patch };
+      draftRef.current = next;
+      setDraft(next);
+      onChange(partsToDatetimeLocalString(next));
     },
     [onChange],
   );
@@ -323,11 +326,12 @@ export default function DateTimePopoverPicker({
               type="button"
               className="min-h-11 rounded-full px-4 text-sm font-medium text-gray-600 transition-colors hover:bg-gray-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-400"
               onClick={() => {
-                onChange("");
                 const fresh = defaultDraft("");
+                draftRef.current = fresh;
                 setDraft(fresh);
                 setViewYear(fresh.year);
                 setViewMonthIndex(fresh.monthIndex);
+                onChange("");
                 onOpenChange(false);
                 triggerRef.current?.focus();
               }}
