@@ -1,0 +1,18 @@
+---
+description: Next.js App Router 라우팅·레이아웃·서버·클라이언트 경계 규칙
+globs: "app/**/*"
+alwaysApply: false
+---
+
+# Next.js App Router
+
+## 반드시 (DO)
+
+- 라우팅·레이아웃·로딩·에러 경계는 **App Router**(`app/` 디렉터리)로 구성한다.
+- 새 페이지는 `app/` 아래에 `page.tsx`, 필요 시 `layout.tsx`, `loading.tsx`, `error.tsx` 등 App Router 관례를 따른다.
+- 서버/클라이언트 경계를 명확히 한다. 클라이언트 전용이 필요할 때만 `"use client"`를 파일 최상단에 두고, **최소 범위**의 컴포넌트/파일에만 적용한다.
+
+## 금지 (DON'T)
+
+- **Pages Router**만을 전제로 한 패턴(`pages/` 중심, `getServerSideProps` / `getStaticProps` 등)을 **새 코드의 기본**으로 제안하지 않는다. (레거시 유지가 요청에 명시된 경우만 예외.)
+- App Router와 맞지 않는 라우팅 방식으로 `app/` 구조를 깨뜨리지 않는다.

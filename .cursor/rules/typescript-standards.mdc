@@ -1,0 +1,17 @@
+---
+description: TypeScript 언어·타입 작성 규칙 (신규 코드는 TS만)
+globs: "**/*.{ts,tsx}"
+alwaysApply: false
+---
+
+# TypeScript
+
+## 반드시 (DO)
+
+- 신규·수정 코드는 **TypeScript** (`.ts`, `.tsx`)로 작성한다.
+- `any` 대신 구체 타입, `unknown` + 타입 가드, 또는 적절한 제네릭을 사용한다.
+- 프로젝트에 이미 있는 타입·유틸·import 스타일을 우선 따른다.
+
+## 금지 (DON'T)
+
+- **JavaScript만** 쓰도록 새 파일을 만들지 않는다. (기존 `.js` 마이그레이션이 요청에 명시된 경우만 예외.)
