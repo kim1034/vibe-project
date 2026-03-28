@@ -18,23 +18,35 @@ export function datetimeLocalValueToIso(value: string): string | null {
   return d.toISOString();
 }
 
-/** 정렬용: 마감(종료) 우선, 없으면 시작, 둘 다 없으면 null */
-const periodFmt = new Intl.DateTimeFormat("ko-KR", {
-  dateStyle: "short",
-  timeStyle: "short",
-});
+/**
+ * Node·브라우저 ICU 차이로 `Intl`이 서버에서는 AM/PM, 클라이언트에서는 오전/오후를 쓰는 경우가 있어
+ * 하이드레이션 불일치가 난다. 로캘 대신 고정 한국어 라벨로 맞춘다.
+ */
+function formatShortDateTimeKo(d: Date): string {
+  const yy = String(d.getFullYear() % 100).padStart(2, "0");
+  const month = d.getMonth() + 1;
+  const day = d.getDate();
+  const hour24 = d.getHours();
+  const minute = d.getMinutes();
+  const isAm = hour24 < 12;
+  const period = isAm ? "오전" : "오후";
+  let h12 = hour24 % 12;
+  if (h12 === 0) h12 = 12;
+  const mm = String(minute).padStart(2, "0");
+  return `${yy}. ${month}. ${day}. ${period} ${h12}:${mm}`;
+}
 
 /** 목록·카드에 표시할 한 줄 요약 */
 export function formatTodoPeriodLine(todo: Pick<Todo, "starts_at" | "ends_at">): string | null {
   if (!todo.starts_at && !todo.ends_at) return null;
   if (todo.starts_at && todo.ends_at) {
-    return `${periodFmt.format(new Date(todo.starts_at))} ~ ${periodFmt.format(new Date(todo.ends_at))}`;
+    return `${formatShortDateTimeKo(new Date(todo.starts_at))} ~ ${formatShortDateTimeKo(new Date(todo.ends_at))}`;
   }
   if (todo.ends_at) {
-    return `마감 ${periodFmt.format(new Date(todo.ends_at))}`;
+    return `마감 ${formatShortDateTimeKo(new Date(todo.ends_at))}`;
   }
   if (todo.starts_at) {
-    return `시작 ${periodFmt.format(new Date(todo.starts_at))}`;
+    return `시작 ${formatShortDateTimeKo(new Date(todo.starts_at))}`;
   }
   return null;
 }

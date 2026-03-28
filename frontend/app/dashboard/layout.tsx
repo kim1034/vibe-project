@@ -30,7 +30,7 @@ export default async function DashboardLayout({
       <div className="mx-auto grid max-w-[1600px] gap-6 px-4 py-6 sm:px-6 lg:gap-8 lg:px-8 lg:py-8 xl:grid-cols-12">
         <aside
           className="hidden flex-col gap-6 xl:col-span-3 xl:flex"
-          aria-label="요약 및 캘린더"
+          aria-label="앱 소개"
         >
           <div className="rounded-[1.75rem] border border-gray-100 bg-white p-6 shadow-[var(--shadow-taskly-soft)]">
             <p className="text-xs font-semibold uppercase tracking-wider text-gray-400">
@@ -42,29 +42,6 @@ export default async function DashboardLayout({
             </p>
             <p className="mt-2 text-sm leading-relaxed text-gray-500">
               집중할 작업을 정리하고 한 번에 처리해 보세요.
-            </p>
-          </div>
-          <div className="rounded-[1.75rem] border border-gray-100 bg-white p-6 shadow-[var(--shadow-taskly-soft)]">
-            <div className="flex items-center justify-between">
-              <h2 className="text-base font-bold text-gray-900">이번 주</h2>
-              <span
-                className="rounded-full bg-[var(--color-taskly-accent)]/25 px-3 py-1 text-xs font-semibold text-gray-800"
-                aria-hidden
-              >
-                Pin
-              </span>
-            </div>
-            <p className="mt-4 text-sm text-gray-500">
-              중요한 할일을 상단에 고정해 두면 매일 한눈에 볼 수 있어요.
-            </p>
-          </div>
-          <div className="rounded-[1.75rem] border border-gray-100 bg-white p-6 shadow-[var(--shadow-taskly-soft)]">
-            <p className="text-xs font-semibold uppercase tracking-wider text-gray-400">
-              날짜별 완료
-            </p>
-            <p className="mt-2 text-sm leading-relaxed text-gray-500">
-              화면 왼쪽 아래에 고정된 캘린더에서 날짜를 누르면, 그날 완료 처리한
-              할일만 목록에서 볼 수 있습니다.
             </p>
           </div>
         </aside>
@@ -126,18 +103,6 @@ export default async function DashboardLayout({
                 ▶
               </span>
             </div>
-          </div>
-          <div className="relative overflow-hidden rounded-[1.75rem] border border-amber-100/80 bg-gradient-to-br from-[var(--color-taskly-accent)]/35 via-white to-amber-50 p-6 shadow-[var(--shadow-taskly-soft)]">
-            <p className="relative z-10 text-sm font-semibold text-gray-900">
-              한 번에 하나씩
-            </p>
-            <p className="relative z-10 mt-2 text-sm leading-relaxed text-gray-600">
-              작은 완료가 쌓이면 하루가 가벼워져요.
-            </p>
-            <div
-              className="pointer-events-none absolute -bottom-6 -right-6 h-28 w-28 rounded-full bg-[var(--color-taskly-accent)]/40 blur-2xl"
-              aria-hidden
-            />
           </div>
         </aside>
       </div>
