@@ -73,10 +73,15 @@ export default function AddTodoForm({
   return (
     <form
       onSubmit={handleSubmit}
-      className={`rounded-lg border border-gray-200 bg-white p-4 shadow-sm ${className}`}
+      className={`rounded-[1.75rem] border border-gray-100 bg-white p-6 shadow-[var(--shadow-taskly-soft)] sm:p-8 ${className}`}
       noValidate
     >
-      <h2 className="mb-4 text-lg font-semibold text-gray-900">새 할일</h2>
+      <h2 className="mb-6 text-2xl font-bold tracking-tight text-gray-900">
+        새{" "}
+        <span className="text-[var(--color-taskly-accent)] drop-shadow-sm">
+          할일
+        </span>
+      </h2>
 
       <div className="flex flex-col gap-4">
         <div>
@@ -99,7 +104,7 @@ export default function AddTodoForm({
         </div>
 
         <div className="flex flex-col gap-1.5">
-          <label htmlFor={memoId} className="text-sm font-medium text-gray-700">
+          <label htmlFor={memoId} className="text-sm font-medium text-gray-800">
             메모 <span className="font-normal text-gray-400">(선택)</span>
           </label>
           <textarea
@@ -109,13 +114,13 @@ export default function AddTodoForm({
             placeholder="추가 설명이 있으면 입력하세요"
             maxLength={MEMO_MAX}
             rows={4}
-            className={`rounded-lg border px-3 py-2 text-sm text-gray-900 placeholder:text-gray-400
-              transition-colors focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20
+            className={`rounded-2xl border px-4 py-2.5 text-sm text-gray-900 placeholder:text-gray-400
+              transition-colors focus:border-amber-400 focus:outline-none focus:ring-2 focus:ring-amber-400/25
               disabled:cursor-not-allowed disabled:bg-gray-50 disabled:text-gray-500
               ${
                 memoError
                   ? "border-red-400 focus:border-red-500 focus:ring-red-500/20"
-                  : "border-gray-300"
+                  : "border-gray-200"
               }`}
             aria-invalid={memoError ? true : undefined}
             aria-describedby={
@@ -142,7 +147,7 @@ export default function AddTodoForm({
           </p>
         )}
 
-        <Button type="submit" loading={isPending} className="self-end">
+        <Button type="submit" loading={isPending} className="self-end px-6">
           추가
         </Button>
       </div>

@@ -45,9 +45,15 @@ export default function SignupForm() {
 
   return (
     <form onSubmit={handleSubmit} className="flex w-full flex-col gap-5">
-      <div className="mb-2 text-center">
-        <h1 className="text-2xl font-bold text-gray-900">회원가입</h1>
-        <p className="mt-1 text-sm text-gray-500">
+      <div className="mb-4 text-center">
+        <h1 className="text-3xl font-bold tracking-tight text-gray-900">
+          회원가입
+        </h1>
+        <span
+          className="mx-auto mt-3 block h-1.5 w-14 rounded-full bg-[var(--color-taskly-accent)] shadow-sm"
+          aria-hidden
+        />
+        <p className="mt-2 text-sm leading-relaxed text-gray-500">
           새 계정을 만들어 할일 관리를 시작하세요
         </p>
       </div>
@@ -90,7 +96,7 @@ export default function SignupForm() {
         </p>
       )}
 
-      <Button type="submit" loading={loading} className="mt-1 w-full">
+      <Button type="submit" loading={loading} className="mt-2 w-full py-3">
         회원가입
       </Button>
 
@@ -98,7 +104,7 @@ export default function SignupForm() {
         이미 계정이 있으신가요?{" "}
         <Link
           href="/login"
-          className="font-medium text-indigo-600 hover:text-indigo-500"
+          className="font-semibold text-amber-700 underline-offset-2 hover:text-amber-600 hover:underline"
         >
           로그인
         </Link>

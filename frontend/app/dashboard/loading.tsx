@@ -3,7 +3,7 @@ import { SkeletonCard, SkeletonLine } from "@/components/ui/Skeleton";
 export default function DashboardLoading() {
   return (
     <div
-      className="flex w-full flex-col gap-6"
+      className="flex w-full flex-col gap-8"
       role="status"
       aria-live="polite"
       aria-busy="true"
@@ -11,7 +11,7 @@ export default function DashboardLoading() {
       <span className="sr-only">할일 목록을 불러오는 중입니다.</span>
       <section
         aria-hidden="true"
-        className="rounded-lg border border-gray-200 bg-white p-4 shadow-sm"
+        className="rounded-[1.75rem] border border-gray-100 bg-white p-6 shadow-[var(--shadow-taskly-soft)]"
       >
         <div className="mb-4">
           <SkeletonLine className="mb-3 w-full" />
@@ -22,13 +22,13 @@ export default function DashboardLoading() {
           <SkeletonLine className="w-full" />
           <SkeletonLine className="w-1/2" />
         </div>
-        <div className="h-10 w-28 animate-pulse rounded-md bg-gray-200" />
+        <div className="h-10 w-28 animate-pulse rounded-full bg-gray-100" />
       </section>
-      <section className="flex flex-col gap-4">
+      <section className="flex flex-col gap-5">
         <div className="flex gap-2" role="presentation">
-          <div className="h-9 w-20 animate-pulse rounded-md bg-gray-200" />
-          <div className="h-9 w-20 animate-pulse rounded-md bg-gray-200" />
-          <div className="h-9 w-20 animate-pulse rounded-md bg-gray-200" />
+          <div className="h-10 w-24 animate-pulse rounded-full bg-gray-100" />
+          <div className="h-10 w-24 animate-pulse rounded-full bg-gray-100" />
+          <div className="h-10 w-24 animate-pulse rounded-full bg-gray-100" />
         </div>
         <SkeletonCard lines={3} />
         <SkeletonCard lines={2} />

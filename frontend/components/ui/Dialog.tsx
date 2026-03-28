@@ -60,18 +60,18 @@ export default function Dialog({
       ref={dialogRef}
       aria-labelledby={titleId}
       aria-describedby={messageId}
-      className="w-full max-w-sm rounded-xl bg-white p-0 shadow-xl backdrop:bg-black/40"
+      className="w-full max-w-sm rounded-[1.5rem] border border-gray-100 bg-white p-0 shadow-[var(--shadow-taskly-soft)] backdrop:bg-gray-900/35"
     >
-      <div className="p-6">
-        <h2 id={titleId} className="text-lg font-semibold text-gray-900">
+      <div className="p-8">
+        <h2 id={titleId} className="text-xl font-bold tracking-tight text-gray-900">
           {title}
         </h2>
-        <p id={messageId} className="mt-2 text-sm text-gray-500">
+        <p id={messageId} className="mt-3 text-sm leading-relaxed text-gray-500">
           {message}
         </p>
       </div>
 
-      <div className="flex justify-end gap-2 border-t border-gray-100 px-6 py-4">
+      <div className="flex justify-end gap-3 border-t border-gray-100 px-6 py-5">
         <Button
           ref={cancelButtonRef}
           variant="ghost"

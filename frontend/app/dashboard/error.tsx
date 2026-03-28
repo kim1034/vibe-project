@@ -25,13 +25,15 @@ export default function DashboardError({
 
   return (
     <div
-      className="flex flex-col items-center justify-center gap-4 rounded-lg border border-red-200 bg-red-50 px-6 py-10 text-center"
+      className="flex flex-col items-center justify-center gap-5 rounded-[1.75rem] border border-red-100 bg-white px-8 py-12 text-center shadow-[var(--shadow-taskly-soft)]"
       role="alert"
     >
-      <h2 className="text-lg font-semibold text-red-900">
+      <h2 className="text-xl font-bold tracking-tight text-red-900">
         할일을 불러오는 중 문제가 발생했습니다
       </h2>
-      <p className="max-w-md text-sm text-red-700">{displayMessage}</p>
+      <p className="max-w-md text-sm leading-relaxed text-red-700/90">
+        {displayMessage}
+      </p>
       <Button type="button" variant="primary" onClick={() => reset()}>
         다시 시도
       </Button>

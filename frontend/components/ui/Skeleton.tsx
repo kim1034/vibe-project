@@ -6,7 +6,7 @@ interface SkeletonLineProps {
 export function SkeletonLine({ width = "w-full", className = "" }: SkeletonLineProps) {
   return (
     <div
-      className={`h-4 animate-pulse rounded bg-gray-200 ${width} ${className}`}
+      className={`h-4 animate-pulse rounded-full bg-gray-100 ${width} ${className}`}
       role="status"
       aria-label="로딩 중"
     />
@@ -23,7 +23,7 @@ export function SkeletonCard({ lines = 3, className = "" }: SkeletonCardProps) {
 
   return (
     <div
-      className={`rounded-lg border border-gray-200 p-4 shadow-sm ${className}`}
+      className={`rounded-[1.75rem] border border-gray-100 bg-white p-5 shadow-[var(--shadow-taskly-soft)] ${className}`}
       role="status"
       aria-label="로딩 중"
     >
@@ -31,7 +31,7 @@ export function SkeletonCard({ lines = 3, className = "" }: SkeletonCardProps) {
         {Array.from({ length: lines }).map((_, i) => (
           <div
             key={i}
-            className={`h-4 animate-pulse rounded bg-gray-200 ${lineWidths[i % lineWidths.length]}`}
+            className={`h-4 animate-pulse rounded-full bg-gray-100 ${lineWidths[i % lineWidths.length]}`}
           />
         ))}
       </div>

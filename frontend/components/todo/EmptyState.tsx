@@ -16,12 +16,12 @@ export default function EmptyState({
 }: EmptyStateProps) {
   return (
     <div
-      className={`flex flex-col items-center justify-center gap-3 rounded-lg border border-dashed border-gray-200 bg-gray-50/80 px-6 py-12 text-center ${className}`}
+      className={`flex flex-col items-center justify-center gap-4 rounded-[1.75rem] border border-dashed border-gray-200/90 bg-white/60 px-8 py-14 text-center shadow-[0_12px_32px_-12px_rgba(17,24,39,0.06)] ${className}`}
       role="status"
       aria-live="polite"
     >
-      <InboxIcon className="h-12 w-12 text-gray-300" aria-hidden />
-      <p className="max-w-sm text-sm text-gray-500">{messages[filter]}</p>
+      <InboxIcon className="h-14 w-14 text-[var(--color-taskly-accent)]/50" aria-hidden />
+      <p className="max-w-sm text-sm leading-relaxed text-gray-500">{messages[filter]}</p>
     </div>
   );
 }

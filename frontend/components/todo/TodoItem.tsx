@@ -127,9 +127,15 @@ export default function TodoItem({
     });
   }
 
+  const doneCard = completed && !isEditing;
+
   return (
     <article
-      className={`rounded-lg border border-gray-200 bg-white p-4 shadow-sm transition-shadow hover:shadow-md ${className}`}
+      className={`rounded-[1.75rem] border p-5 transition-shadow sm:p-6 ${className} ${
+        doneCard
+          ? "border-amber-200/50 bg-[var(--color-taskly-accent)] shadow-lg shadow-amber-200/25 hover:shadow-xl"
+          : "border-gray-100 bg-white shadow-[var(--shadow-taskly-soft)] hover:shadow-[0_28px_56px_-14px_rgba(17,24,39,0.1)]"
+      }`}
     >
       <div className="flex gap-3">
         <div className="mt-0.5 shrink-0">
@@ -143,7 +149,11 @@ export default function TodoItem({
             onChange={handleToggle}
             disabled={isEditing || togglePending}
             aria-label={`${todo.title} 완료로 표시`}
-            className="h-5 w-5 rounded border-gray-300 text-indigo-600 focus:ring-2 focus:ring-indigo-500 focus:ring-offset-0 disabled:cursor-not-allowed disabled:opacity-50"
+            className={`h-5 w-5 rounded-md focus:ring-2 focus:ring-offset-0 disabled:cursor-not-allowed disabled:opacity-50 ${
+              doneCard
+                ? "border-white/70 text-amber-600 focus:ring-white/80"
+                : "border-gray-300 text-amber-500 focus:ring-amber-400"
+            }`}
           />
         </div>
 
@@ -166,7 +176,7 @@ export default function TodoItem({
               <div className="flex flex-col gap-1.5">
                 <label
                   htmlFor={memoId}
-                  className="text-sm font-medium text-gray-700"
+                  className="text-sm font-medium text-gray-800"
                 >
                   메모 <span className="font-normal text-gray-400">(선택)</span>
                 </label>
@@ -176,9 +186,9 @@ export default function TodoItem({
                   onChange={(e) => setEditMemo(e.target.value)}
                   maxLength={MEMO_MAX}
                   rows={3}
-                  className={`rounded-lg border px-3 py-2 text-sm text-gray-900 transition-colors
-                    focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20
-                    ${memoError ? "border-red-400" : "border-gray-300"}`}
+                  className={`rounded-2xl border px-4 py-2.5 text-sm text-gray-900 transition-colors
+                    focus:border-amber-400 focus:outline-none focus:ring-2 focus:ring-amber-400/25
+                    ${memoError ? "border-red-400" : "border-gray-200"}`}
                   aria-invalid={memoError ? true : undefined}
                 />
                 <div className="flex justify-end">
@@ -217,8 +227,10 @@ export default function TodoItem({
               <div className="flex flex-wrap items-start justify-between gap-2">
                 <div className="min-w-0 flex-1">
                   <h3
-                    className={`text-base font-medium ${
-                      completed ? "text-gray-400 line-through" : "text-gray-900"
+                    className={`text-base font-semibold ${
+                      completed
+                        ? "text-white/95 line-through decoration-white/60"
+                        : "text-gray-900"
                     }`}
                   >
                     {todo.title}
@@ -226,7 +238,7 @@ export default function TodoItem({
                   {todo.memo ? (
                     <p
                       className={`mt-1 whitespace-pre-wrap text-sm ${
-                        completed ? "text-gray-400" : "text-gray-600"
+                        completed ? "text-white/85" : "text-gray-600"
                       }`}
                     >
                       {todo.memo}
@@ -240,6 +252,11 @@ export default function TodoItem({
                     size="sm"
                     onClick={startEdit}
                     aria-label="할일 수정"
+                    className={
+                      completed
+                        ? "text-white hover:bg-white/15 focus-visible:ring-white/40"
+                        : ""
+                    }
                   >
                     수정
                   </Button>
@@ -252,13 +269,21 @@ export default function TodoItem({
                       setDeleteOpen(true);
                     }}
                     aria-label="할일 삭제"
+                    className={
+                      completed
+                        ? "bg-white/20 text-white ring-1 ring-white/30 hover:bg-white/30 focus-visible:ring-white/50"
+                        : ""
+                    }
                   >
                     삭제
                   </Button>
                 </div>
               </div>
               {actionError ? (
-                <p className="mt-2 text-sm text-red-500" role="alert">
+                <p
+                  className={`mt-2 text-sm ${completed ? "font-medium text-red-900" : "text-red-500"}`}
+                  role="alert"
+                >
                   {actionError}
                 </p>
               ) : null}

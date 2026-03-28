@@ -20,16 +20,18 @@ export default function DashboardHeader({
 }) {
   return (
     <header
-      className="border-b border-gray-200 bg-white"
+      className="rounded-[1.75rem] border border-gray-100 bg-white px-5 py-4 shadow-[var(--shadow-taskly-soft)]"
       role="banner"
     >
-      <div className="mx-auto flex max-w-2xl items-center justify-between px-4 py-4">
-        <h1 className="text-lg font-bold text-gray-900">Todo App</h1>
+      <div className="flex w-full items-center justify-between gap-4">
+        <h1 className="text-lg font-bold tracking-tight text-gray-900">
+          대시보드
+        </h1>
 
         <div className="flex items-center gap-3">
           {email && (
             <span
-              className="hidden text-sm text-gray-500 sm:inline"
+              className="hidden max-w-[200px] truncate rounded-full border border-gray-100 bg-gray-50/80 px-3 py-1 text-xs font-medium text-gray-500 sm:inline"
               title={email}
             >
               {email}

@@ -31,7 +31,7 @@ export default function DashboardTodoClient({
   );
 
   return (
-    <div className="flex w-full flex-col gap-6">
+    <div className="flex w-full flex-col gap-8">
       <AddTodoForm onSuccess={refresh} />
       <section aria-labelledby="todo-list-heading">
         <h2 id="todo-list-heading" className="sr-only">
@@ -40,7 +40,7 @@ export default function DashboardTodoClient({
         <TodoFilter
           value={filter}
           onChange={setFilter}
-          className="mb-4"
+          className="mb-6"
         />
         <TodoList
           todos={filtered}

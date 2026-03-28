@@ -24,7 +24,7 @@ export default function TodoList({
 
   return (
     <ul
-      className={`flex flex-col gap-3 ${className}`}
+      className={`flex flex-col gap-4 ${className}`}
       aria-label="할일 목록"
     >
       {todos.map((todo) => (

@@ -2,9 +2,14 @@
 
 @theme inline {
   --font-sans: var(--font-geist-sans);
+  /* Taskly-style warm accent */
+  --color-taskly-accent: #ffd56b;
+  --color-taskly-accent-hover: #f5c84a;
+  --shadow-taskly-soft: 0 24px 48px -12px rgb(17 24 39 / 0.07),
+    0 12px 24px -10px rgb(17 24 39 / 0.05);
 }
 
 body {
-  background-color: #ffffff;
-  color: #111827; /* gray-900 */
+  background-color: #f9fafb;
+  color: #111827;
 }

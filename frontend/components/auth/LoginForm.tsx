@@ -42,9 +42,15 @@ export default function LoginForm({
 
   return (
     <form onSubmit={handleSubmit} className="flex w-full flex-col gap-5">
-      <div className="mb-2 text-center">
-        <h1 className="text-2xl font-bold text-gray-900">로그인</h1>
-        <p className="mt-1 text-sm text-gray-500">
+      <div className="mb-4 text-center">
+        <h1 className="text-3xl font-bold tracking-tight text-gray-900">
+          로그인
+        </h1>
+        <span
+          className="mx-auto mt-3 block h-1.5 w-14 rounded-full bg-[var(--color-taskly-accent)] shadow-sm"
+          aria-hidden
+        />
+        <p className="mt-2 text-sm leading-relaxed text-gray-500">
           계정에 로그인하여 할일을 관리하세요
         </p>
       </div>
@@ -76,7 +82,7 @@ export default function LoginForm({
         </p>
       )}
 
-      <Button type="submit" loading={loading} className="mt-1 w-full">
+      <Button type="submit" loading={loading} className="mt-2 w-full py-3">
         로그인
       </Button>
 
@@ -84,7 +90,7 @@ export default function LoginForm({
         계정이 없으신가요?{" "}
         <Link
           href="/signup"
-          className="font-medium text-indigo-600 hover:text-indigo-500"
+          className="font-semibold text-amber-700 underline-offset-2 hover:text-amber-600 hover:underline"
         >
           회원가입
         </Link>

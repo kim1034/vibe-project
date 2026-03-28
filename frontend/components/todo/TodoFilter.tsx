@@ -35,7 +35,7 @@ export default function TodoFilter({
   return (
     <div className={className}>
       <div
-        className="flex gap-1 rounded-lg border border-gray-200 bg-gray-100/80 p-1"
+        className="flex gap-1 rounded-full border border-gray-100 bg-white/90 p-1.5 shadow-[0_8px_24px_-8px_rgba(17,24,39,0.08)]"
         role="tablist"
         aria-label="할일 필터"
         onKeyDown={handleTabListKeyDown}
@@ -50,10 +50,10 @@ export default function TodoFilter({
               aria-selected={selected}
               tabIndex={selected ? 0 : -1}
               id={`todo-filter-${tab.id}`}
-              className={`flex-1 rounded-md px-3 py-2 text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2 ${
+              className={`flex-1 rounded-full px-3 py-2.5 text-sm font-semibold transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-400 focus-visible:ring-offset-2 ${
                 selected
-                  ? "bg-white text-indigo-700 shadow-sm"
-                  : "text-gray-600 hover:text-gray-900"
+                  ? "bg-[var(--color-taskly-accent)] text-gray-900 shadow-sm"
+                  : "text-gray-500 hover:text-gray-800"
               }`}
               onClick={() => onChange(tab.id)}
             >

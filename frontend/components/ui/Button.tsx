@@ -14,11 +14,11 @@ interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 
 const variantStyles: Record<ButtonVariant, string> = {
   primary:
-    "bg-indigo-600 text-white hover:bg-indigo-700 focus-visible:ring-indigo-500 disabled:bg-indigo-300",
+    "bg-[var(--color-taskly-accent)] text-gray-900 hover:bg-[var(--color-taskly-accent-hover)] focus-visible:ring-amber-400 disabled:bg-amber-200/80 disabled:text-gray-500",
   danger:
     "bg-red-500 text-white hover:bg-red-600 focus-visible:ring-red-400 disabled:bg-red-300",
   ghost:
-    "bg-transparent text-gray-700 hover:bg-gray-100 focus-visible:ring-gray-400 disabled:text-gray-400",
+    "bg-transparent text-gray-600 hover:bg-gray-100/90 focus-visible:ring-amber-300/80 disabled:text-gray-400",
 };
 
 const sizeStyles: Record<ButtonSize, string> = {
@@ -43,7 +43,7 @@ export default function Button({
       type={type}
       aria-busy={loading || undefined}
       disabled={disabled || loading}
-      className={`inline-flex items-center justify-center gap-2 rounded-lg font-medium transition-colors
+      className={`inline-flex items-center justify-center gap-2 rounded-full font-medium transition-colors
         focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2
         disabled:cursor-not-allowed ${variantStyles[variant]} ${sizeStyles[size]} ${className}`}
       {...rest}
