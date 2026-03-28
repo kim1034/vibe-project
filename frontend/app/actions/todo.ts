@@ -2,7 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
-import { mapNetworkMessage } from "@/lib/mapErrors";
+import { mapSupabaseMutationError } from "@/lib/mapErrors";
 import type { ActionResult } from "@/types/action";
 
 const TITLE_MAX = 200;
@@ -35,27 +35,20 @@ function normalizeMemo(memo: string | null | undefined): string | null {
   return t === "" ? null : t;
 }
 
-function mapDbError(message: string): string {
-  const network = mapNetworkMessage(message);
-  if (network) return network;
-  const lower = message.toLowerCase();
-  if (
-    lower.includes("jwt") ||
-    lower.includes("session") ||
-    lower.includes("auth")
-  ) {
-    return "인증이 만료되었습니다. 다시 로그인해주세요.";
-  }
-  if (lower.includes("permission") || lower.includes("policy")) {
-    return "권한이 없습니다.";
-  }
-  if (
-    lower.includes("todos_period_order") ||
-    lower.includes("period_order")
-  ) {
-    return "종료 일시는 시작 일시보다 이후여야 합니다.";
-  }
-  return "요청을 처리하지 못했습니다. 잠시 후 다시 시도해주세요.";
+function shouldLogSupabaseActionDetails(): boolean {
+  return (
+    process.env.NODE_ENV === "development" ||
+    process.env.VERCEL_ENV === "preview"
+  );
+}
+
+/** dev/preview에서만. UI에는 mapSupabaseMutationError로 치환되므로, 원인 확인 시 Next 터미널에서 `[todo:createTodo]` 등으로 검색. */
+function logSupabaseActionError(
+  action: string,
+  err: { message: string; code?: string },
+): void {
+  if (!shouldLogSupabaseActionDetails()) return;
+  console.error(`[todo:${action}]`, err.code ?? "", err.message);
 }
 
 /** ISO 문자열 또는 null. 빈 문자열은 null */
@@ -131,7 +124,8 @@ export async function createTodo(
   });
 
   if (error) {
-    return { success: false, error: mapDbError(error.message) };
+    logSupabaseActionError("createTodo", error);
+    return { success: false, error: mapSupabaseMutationError(error.message) };
   }
 
   revalidatePath("/dashboard");
@@ -196,7 +190,8 @@ export async function updateTodo(
     .select("id");
 
   if (error) {
-    return { success: false, error: mapDbError(error.message) };
+    logSupabaseActionError("updateTodo", error);
+    return { success: false, error: mapSupabaseMutationError(error.message) };
   }
   if (!data?.length) {
     return { success: false, error: "수정 권한이 없거나 항목을 찾을 수 없습니다." };
@@ -235,7 +230,8 @@ export async function toggleTodo(
     .select("id");
 
   if (error) {
-    return { success: false, error: mapDbError(error.message) };
+    logSupabaseActionError("toggleTodo", error);
+    return { success: false, error: mapSupabaseMutationError(error.message) };
   }
   if (!data?.length) {
     return { success: false, error: "수정 권한이 없거나 항목을 찾을 수 없습니다." };
@@ -268,7 +264,8 @@ export async function deleteTodo(id: string): Promise<ActionResult> {
     .select("id");
 
   if (error) {
-    return { success: false, error: mapDbError(error.message) };
+    logSupabaseActionError("deleteTodo", error);
+    return { success: false, error: mapSupabaseMutationError(error.message) };
   }
   if (!data?.length) {
     return { success: false, error: "삭제에 실패했습니다." };
