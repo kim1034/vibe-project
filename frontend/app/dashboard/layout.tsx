@@ -60,37 +60,12 @@ export default async function DashboardLayout({
           </div>
           <div className="rounded-[1.75rem] border border-gray-100 bg-white p-6 shadow-[var(--shadow-taskly-soft)]">
             <p className="text-xs font-semibold uppercase tracking-wider text-gray-400">
-              오늘
+              날짜별 완료
             </p>
-            <p className="mt-2 flex flex-wrap items-baseline gap-2">
-              <span className="text-3xl font-bold text-gray-900">토요일</span>
-              <span className="flex h-11 min-w-11 items-center justify-center rounded-full bg-[var(--color-taskly-accent)] px-3 text-lg font-bold text-gray-900 shadow-sm">
-                28
-              </span>
+            <p className="mt-2 text-sm leading-relaxed text-gray-500">
+              화면 왼쪽 아래에 고정된 캘린더에서 날짜를 누르면, 그날 완료 처리한
+              할일만 목록에서 볼 수 있습니다.
             </p>
-            <p className="mt-2 text-sm text-gray-500">2026년 3월</p>
-            <div
-              className="mt-5 grid grid-cols-7 gap-1.5 text-center text-[11px] font-medium text-gray-400"
-              aria-hidden
-            >
-              {["일", "월", "화", "수", "목", "금", "토"].map((d) => (
-                <span key={d}>{d}</span>
-              ))}
-              {Array.from({ length: 35 }, (_, slot) => {
-                const day = slot < 31 ? slot + 1 : null;
-                const isToday = day === 28;
-                return (
-                  <span
-                    key={slot}
-                    className={`flex h-8 items-center justify-center rounded-full text-sm text-gray-600 ${
-                      day === null ? "text-transparent" : ""
-                    } ${isToday ? "bg-[var(--color-taskly-accent)] font-semibold text-gray-900 shadow-sm" : ""}`}
-                  >
-                    {day ?? "·"}
-                  </span>
-                );
-              })}
-            </div>
           </div>
         </aside>
 

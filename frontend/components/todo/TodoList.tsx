@@ -7,6 +7,8 @@ interface TodoListProps {
   todos: Todo[];
   /** 빈 목록일 때 안내 문구를 탭에 맞게 표시합니다 */
   activeFilter: TodoTabFilter;
+  /** 완료일 기준 날짜 필터(YYYY-MM-DD) */
+  completionDateKey?: string | null;
   /** 항목 변경(토글·수정·삭제) 후 목록 갱신 */
   onTodoChange?: () => void;
   className?: string;
@@ -15,11 +17,18 @@ interface TodoListProps {
 export default function TodoList({
   todos,
   activeFilter,
+  completionDateKey = null,
   onTodoChange,
   className = "",
 }: TodoListProps) {
   if (todos.length === 0) {
-    return <EmptyState filter={activeFilter} className={className} />;
+    return (
+      <EmptyState
+        filter={activeFilter}
+        completionDateKey={completionDateKey}
+        className={className}
+      />
+    );
   }
 
   return (

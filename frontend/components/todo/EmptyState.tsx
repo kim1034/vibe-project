@@ -1,6 +1,8 @@
 interface EmptyStateProps {
   /** 어떤 탭에서 비었는지에 따라 문구가 달라집니다 */
   filter: "all" | "active" | "completed";
+  /** 날짜 필터가 켜진 경우(YYYY-MM-DD) */
+  completionDateKey?: string | null;
   className?: string;
 }
 
@@ -12,8 +14,19 @@ const messages: Record<EmptyStateProps["filter"], string> = {
 
 export default function EmptyState({
   filter,
+  completionDateKey = null,
   className = "",
 }: EmptyStateProps) {
+  let message = messages[filter];
+  if (completionDateKey) {
+    if (filter === "active") {
+      message =
+        "진행 중인 할일은 날짜별 완료 목록에 포함되지 않습니다. 「전체」 또는 「완료」 탭을 선택해 보세요.";
+    } else {
+      message = "이 날짜에 완료 처리한 할일이 없습니다.";
+    }
+  }
+
   return (
     <div
       className={`flex flex-col items-center justify-center gap-4 rounded-[1.75rem] border border-dashed border-gray-200/90 bg-white/60 px-8 py-14 text-center shadow-[0_12px_32px_-12px_rgba(17,24,39,0.06)] ${className}`}
@@ -21,7 +34,7 @@ export default function EmptyState({
       aria-live="polite"
     >
       <InboxIcon className="h-14 w-14 text-[var(--color-taskly-accent)]/50" aria-hidden />
-      <p className="max-w-sm text-sm leading-relaxed text-gray-500">{messages[filter]}</p>
+      <p className="max-w-sm text-sm leading-relaxed text-gray-500">{message}</p>
     </div>
   );
 }

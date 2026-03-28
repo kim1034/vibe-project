@@ -163,7 +163,10 @@ export async function toggleTodo(
 
   const { data, error } = await supabase
     .from("todos")
-    .update({ is_completed })
+    .update({
+      is_completed,
+      completed_at: is_completed ? new Date().toISOString() : null,
+    })
     .eq("id", id)
     .eq("user_id", user.id)
     .select("id");

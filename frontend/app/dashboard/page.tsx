@@ -23,7 +23,13 @@ export default async function DashboardPage() {
     throw new Error(error.message);
   }
 
-  const todos = (rows ?? []) as Todo[];
+  const todos: Todo[] = (rows ?? []).map((row) => {
+    const r = row as Todo;
+    return {
+      ...r,
+      completed_at: r.completed_at ?? null,
+    };
+  });
 
   return <DashboardTodoClient initialTodos={todos} />;
 }
