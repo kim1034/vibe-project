@@ -176,7 +176,7 @@ export default function AddTodoForm({
           onEndsChange={setEndsLocal}
           error={periodError || undefined}
           disabled={isPending}
-          hint="비워 두면 기간 없음. 입력한 시각은 이 기기의 로컬 시간이며, 저장 시 UTC로 맞춰집니다."
+          hint="비우면 기간 없음 · 이 기기 로컬 시각으로 입력되며 저장 시 UTC로 변환됩니다."
         />
 
         {submitError && (

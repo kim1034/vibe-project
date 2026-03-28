@@ -1,6 +1,7 @@
-const inputClassName = `w-full rounded-2xl border border-gray-200 bg-white px-4 py-2.5 text-sm text-gray-900
-  transition-colors focus:border-amber-400 focus:outline-none focus:ring-2 focus:ring-amber-400/25
-  disabled:cursor-not-allowed disabled:bg-gray-50 disabled:text-gray-500`;
+"use client";
+
+import { useCallback, useState } from "react";
+import DateTimePopoverPicker from "@/components/todo/DateTimePopoverPicker";
 
 interface TodoPeriodFieldsProps {
   startsId: string;
@@ -26,45 +27,71 @@ export default function TodoPeriodFields({
   disabled = false,
   hint,
 }: TodoPeriodFieldsProps) {
+  const [openSlot, setOpenSlot] = useState<"start" | "end" | null>(null);
+
+  const hintId = `${startsId}-period-hint`;
+  const errId = `${startsId}-period-err`;
+  const describedBy =
+    [hint ? hintId : null, error ? errId : null].filter(Boolean).join(" ") ||
+    undefined;
+
+  const onStartOpenChange = useCallback((next: boolean) => {
+    setOpenSlot((prev) => {
+      if (next) return "start";
+      if (prev === "start") return null;
+      return prev;
+    });
+  }, []);
+
+  const onEndOpenChange = useCallback((next: boolean) => {
+    setOpenSlot((prev) => {
+      if (next) return "end";
+      if (prev === "end") return null;
+      return prev;
+    });
+  }, []);
+
   return (
     <div className="flex flex-col gap-3">
       {hint ? (
-        <p className="text-xs text-gray-500">{hint}</p>
+        <p id={hintId} className="text-xs text-gray-500">
+          {hint}
+        </p>
       ) : null}
       <div className="grid gap-4 sm:grid-cols-2">
         <div className="flex flex-col gap-1.5">
           <label htmlFor={startsId} className="text-sm font-medium text-gray-800">
             시작 일시 <span className="font-normal text-gray-400">(선택)</span>
           </label>
-          <input
+          <DateTimePopoverPicker
             id={startsId}
-            type="datetime-local"
             value={startsValue}
-            onChange={(e) => onStartsChange(e.target.value)}
+            onChange={onStartsChange}
             disabled={disabled}
-            className={`${inputClassName} ${error ? "border-red-400 focus:border-red-500 focus:ring-red-500/20" : ""}`}
-            aria-invalid={error ? true : undefined}
-            aria-describedby={error ? `${startsId}-period-err` : undefined}
+            hasError={Boolean(error)}
+            describedBy={describedBy}
+            open={openSlot === "start"}
+            onOpenChange={onStartOpenChange}
           />
         </div>
         <div className="flex flex-col gap-1.5">
           <label htmlFor={endsId} className="text-sm font-medium text-gray-800">
             종료·마감 일시 <span className="font-normal text-gray-400">(선택)</span>
           </label>
-          <input
+          <DateTimePopoverPicker
             id={endsId}
-            type="datetime-local"
             value={endsValue}
-            onChange={(e) => onEndsChange(e.target.value)}
+            onChange={onEndsChange}
             disabled={disabled}
-            className={`${inputClassName} ${error ? "border-red-400 focus:border-red-500 focus:ring-red-500/20" : ""}`}
-            aria-invalid={error ? true : undefined}
-            aria-describedby={error ? `${startsId}-period-err` : undefined}
+            hasError={Boolean(error)}
+            describedBy={describedBy}
+            open={openSlot === "end"}
+            onOpenChange={onEndOpenChange}
           />
         </div>
       </div>
       {error ? (
-        <p id={`${startsId}-period-err`} className="text-xs text-red-500" role="alert">
+        <p id={errId} className="text-xs text-red-500" role="alert">
           {error}
         </p>
       ) : null}
